@@ -47,9 +47,13 @@ if __name__ == '__main__':
     net.start()
     host1 = net.get('host1')
     host2 = net.get('host2')
-    host1.cmd('MulticastSender.py')
-    response2 = host2.cmd('MulticastReceiver.py')
-    print response2
+    print host1.IP(), host2.IP()
+    response1 = host1.cmd('python MulticastSender.py')
+#    response2 = host2.cmd('python MulticastReceiver.py')
+    print response1
+#    print response2
+    print host1.cmd('ping 127.0.0.1')
+#    print host2.cmd('ifconfig')
     #net.pingAll()
     #time.sleep(5)
     #net.configLinkStatus("host" + str(numberOfNodes - 1),"s1","down")
