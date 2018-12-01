@@ -17,7 +17,7 @@ class SingleSwitchTopo(Topo):
 
 		#Create hosts given hostCount
 
-		for i in range(0, numberOfNodes):
+		for i in range(1, numberOfNodes + 1):
 
 			hosts.append(self.addHost("host" + str(i)))
 
@@ -45,10 +45,15 @@ loss = float(sys.argv[2])
 if __name__ == '__main__':
     net = Mininet( topo=SingleSwitchTopo(numberOfNodes, loss) , link = TCLink)
     net.start()
-    net.pingAll()
-    time.sleep(5)
-    net.configLinkStatus("host" + str(numberOfNodes - 1),"s1","down")
-    net.pingAll()
-    net.configLinkStatus("host" + str(numberOfNodes - 1),"s1","up")
-    net.pingAll()
+    host1 = net.get('host1')
+    host2 = net.get('host2')
+    host1.cmd('MulticastSender.py')
+    response2 = host2.cmd('MulticastReceiver.py')
+    print response2
+    #net.pingAll()
+    #time.sleep(5)
+    #net.configLinkStatus("host" + str(numberOfNodes - 1),"s1","down")
+    #net.pingAll()
+    #net.configLinkStatus("host" + str(numberOfNodes - 1),"s1","up")
+    #net.pingAll()
     net.stop()
