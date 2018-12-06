@@ -6,7 +6,6 @@ from mininet.topo import SingleSwitchTopo
 from mininet.log import setLogLevel
 from mininet.link import TCLink
 import time
-from time import sleep
 import os
 
 
@@ -48,22 +47,12 @@ if __name__ == '__main__':
     net.start()
     host1 = net.get('host1')
     host2 = net.get('host2')
-    host3 = net.get('host3')
-    host4 = net.get('host4')
-    host5 = net.get('host5')
-    print host1.IP(), host2.IP(), host3.IP(), host4.IP(), host5.IP()
-    response2 = host2.cmd('python MulticastReceiver.py 2 &')
-    response3 = host3.cmd('python MulticastReceiver.py 3 &')
-    response4 = host4.cmd('python MulticastReceiver.py 4 &')
-    response5 = host5.cmd('python MulticastReceiver.py 5 &')
-    sleep(10)
-
-    response1 = host1.cmd('python MulticastSender.py 1 ' + str(numberOfNodes) +  ' ')
-    #print response1
-    #print response2
-    #print response3
-    #print response4
-    #print response5
+    print host1.IP(), host2.IP()
+    response1 = host1.cmd('python MulticastSender.py')
+    response2 = host2.cmd('python MulticastReceiver.py')
+    print response1
+    
+print response2
  #   print host1.cmd('ping 127.0.0.1')
 #    print host2.cmd('ifconfig')
     #net.pingAll()
