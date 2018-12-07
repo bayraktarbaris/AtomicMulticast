@@ -1,6 +1,5 @@
 host2
 10.0.0.2 1000
-Message: Thu Dec  6 18:14:46 2018 , LastSender: 0
+Message: Fri Dec  7 17:59:49 2018 , LastSender: 10.0.0.1
 sending message to 10.0.0.3
-Message is sent by : host 2
-Queue of 2, message Thu Dec  6 18:14:46 2018
+Queue of 2, message Fri Dec  7 17:59:49 2018

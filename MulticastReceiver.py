@@ -3,6 +3,8 @@ import sys
 import pickle
 
 hostId = sys.argv[1] # Gets the id of the host that executes this script
+memberCount = int(sys.argv[2])
+
 f = open("responses/host" + hostId + ".txt","w") ########## Create a file object to store all the printables related to multicastReceiver
 # create a socket object
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -16,6 +18,8 @@ f.close()
 
 messageQueue = []
 
+neighborIp = ""
+
 f = open("responses/host" + hostId + ".txt","a")
 
 while True:
@@ -26,17 +30,39 @@ while True:
 
 	f.write("Message: " + message.message + " , LastSender: " + str(message.lastSender) + "\n")
 
-	#f.close()
-
 	if message not in messageQueue:		#Somehow if I got the message from 2 other entities then I ignore the last 
 
 		messageQueue.append(message)
 
 	########################	Got the message forward it 		#########################################
 
-	message.lastSender = addr
+	if int(message.lastSender[7]) < int(hostId):		# If i get the packet from a neigbor with lower id i sent to other neighbor with higher id
 
-	neighborIP = hostIP[:7] + str(int(hostIP[7]) + 1) 
+		if int(hostId) - int(message.lastSender[7]) > 1:	# 1st sends to 5 5 should send to 4 not 6
+
+			neighborIP = hostIP[:7] + str(int(hostIP[7]) - 1)
+
+		else:	
+
+			neighborIP = hostIP[:7] + str((int(hostIP[7]) % memberCount + 1))
+
+	else:
+
+		if int(message.lastSender[7]) - int(hostId) > 1:
+
+			neighborIP = hostIP[:7] + str(int(hostIP[7]) + 1) #5th sends to 1 1 should send to 2 not 5
+
+		else:	
+
+			if hostId == '1':	# If my id is 1 but I got from 2 then i send to last member
+
+				neighborIP = hostIP[:7] + str(memberCount)
+		
+			else:	
+
+				neighborIP = hostIP[:7] + str(int(hostIP[7]) - 1)
+
+	message.lastSender = hostIP
 
 	message = pickle.dumps(message)
 
@@ -44,7 +70,7 @@ while True:
 
 	r1 = s.sendto(message, (neighborIP, port))
 
-	f.write("Message is sent by : host " + hostId + "\n") 
+	#f.write("Message is sent by : host " + hostId + "\n") 
 
 	s.close()
 
@@ -54,5 +80,7 @@ for i in range(0,len(messageQueue)):
 
 	f.write("Queue of %s, message %s"%(hostId,messageQueue[i].message))
 
-f.close()	
+f.close()
+
+exit()	
 

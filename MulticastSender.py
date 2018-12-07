@@ -58,6 +58,8 @@ currentTime = time.ctime(time.time()) + "\r"
 
 message = Message(hostId, currentTime)
 
+message.lastSender = Ip + hostId
+
 message = pickle.dumps(message)
 # queue up to 5 requests
 #sender_socket.listen(5) 
@@ -83,5 +85,5 @@ while True:
 f.write("Sender sent all the packets to its neighbors!" + "\n")
 
 f.close()
-#	sender_socket.close()
+
 

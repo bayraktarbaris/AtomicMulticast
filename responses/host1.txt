@@ -1,6 +1,6 @@
 host1
 10.0.0.21000
 10.0.0.51000
-Thu Dec  6 18:14:46 201810.0.0.2 10.0.0.5
-bytes sent r1 = 130 r2 = 130
+Fri Dec  7 17:59:49 201810.0.0.2 10.0.0.5
+bytes sent r1 = 142 r2 = 142
 Sender sent all the packets to its neighbors!
