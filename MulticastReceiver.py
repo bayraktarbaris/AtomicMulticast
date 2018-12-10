@@ -1,17 +1,32 @@
 import socket
 import sys
 import pickle
+from message import Message
+from queue import Queue
 
+print "amk"
 hostId = sys.argv[1] # Gets the id of the host that executes this script
-memberCount = int(sys.argv[2])
 
-f = open("responses/host" + hostId + ".txt","w") ########## Create a file object to store all the printables related to multicastReceiver
+memberCount = int(sys.argv[2])
+multicastInitiator = int(sys.argv[3])
+
+f = open("responses/host" + hostId + ".txt","w+") ########## Create a file object to store all the printables related to multicastReceiverf.write(hostId)
+hostTree = list(range(1, memberCount+1))
+for i in range(int(len(hostTree)/2)+multicastInitiator):
+	hostTree = hostTree[1:] + hostTree[:1]
+
+for i in hostTree:
+	f.write(str(i))
+
 # create a socket object
+f.write("1")
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 # get local machine name
+f.write("2")
 hostIP, port = '10.0.0.' + hostId, 1000
 s.bind((hostIP, port))
-f = open("responses/host" + hostId + ".txt","w")
+f.write("3")
+f = open("responses/host" + hostId + ".txt","w+")
 f.write("host" + hostId + "\n")
 f.write(hostIP + " " + str(port) + "\n")
 f.close()
@@ -19,66 +34,206 @@ f.close()
 messageQueue = []
 
 neighborIp = ""
+#f.write(4)
 
-f = open("responses/host" + hostId + ".txt","a")
+f = open("responses/host" + hostId + ".txt","a+")
 
 while True:
+
+	s.settimeout(5)
+
+	message, addr = s.recvfrom(1024)
+
+	message = pickle.loads(message)
+
+	f.write(message.message) 
+
+	try:
+
+		if message.fromChild == False:
+			
+			if hostTree.index(int(hostId)) < hostTree.index(multicastInitiator) and hostTree.index(int(hostId)) != 0:
+
+				childIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) - 1])
+
+
+				message = pickle.dumps(message)
+				
+
+				r = s.sendto(message,(childIP, port))
+
+			elif hostTree.index(int(hostId)) > hostTree.index(multicastInitiator) and hostTree.index(int(hostId)) != memberCount - 1:	
+
+				childIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) + 1])
+
+
+				message = pickle.dumps(message)
+				
+
+				r = s.sendto(message,(childIP, port))
+
+			elif hostTree.index(int(hostId)) == 0:
+			
+				childIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) + 1])
+
+				message.fromChild = True
+
+				message = pickle.dumps(message)
+				
+
+				r = s.sendto(message,(childIP, port))	
+				break
+
+			elif hostTree.index(int(hostId)) == memberCount - 1:
+			
+				childIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) - 1])
+
+				message.fromChild = True
+
+
+				message = pickle.dumps(message)
+				
+
+				r = s.sendto(message,(childIP, port))
+				break
+
+		elif message.fromChild == True:
+			
+			if hostTree.index(int(hostId)) < hostTree.index(multicastInitiator):
+
+				childIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) + 1])
+
+				message = pickle.dumps(message)
+
+				
+
+				r = s.sendto(message,(childIP, port))
+
+			elif hostTree.index(int(hostId)) > hostTree.index(multicastInitiator):	
+
+				childIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) - 1])
+
+				message = pickle.dumps(message)
+				
+
+				r = s.sendto(message,(childIP, port))	
+			break
+
+
+	except Exception as e:
+	
+		continue
+
+
+if i == 2:
+
+	f.write("Parent or child is unreachable !")
+
+	f.close()
+
+	exit(-1)
+
+f.close()	
+
+#######################################################################################################
+
+queue = Queue("responses/host" + hostId + "queue.txt")
+
+while True:
+
+	s.settimeout(5)
 	
 	message, addr = s.recvfrom(1024)
 
 	message = pickle.loads(message)
 
-	f.write("Message: " + message.message + " , LastSender: " + str(message.lastSender) + "\n")
+	if message.message == "currentTime" and message not in queue.read():
 
-	if message not in messageQueue:		#Somehow if I got the message from 2 other entities then I ignore the last 
+		queue.append(str(message.multicastSenderId) + ' ' + str(message.clockOfInitiator))
 
-		messageQueue.append(message)
+		if hostTree.index(int(hostId)) < hostTree.index(multicastInitiator) and hostTree.index(int(hostId)) != 0:
 
-	########################	Got the message forward it 		#########################################
+			childIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) - 1])
 
-	if int(message.lastSender[7]) < int(hostId):		# If i get the packet from a neigbor with lower id i sent to other neighbor with higher id
+			parentIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) + 1])
 
-		if int(hostId) - int(message.lastSender[7]) > 1:	# 1st sends to 5 5 should send to 4 not 6
+			message = pickle.dumps(message)
+			
+			r = s.sendto(message,(childIP, port))
 
-			neighborIP = hostIP[:7] + str(int(hostIP[7]) - 1)
+			ackMessage = pickle.dumps(Message(multicastSenderId = hostId,message = "ack", clockOfInitiator = message.clockOfInitiator))
 
-		else:	
 
-			neighborIP = hostIP[:7] + str((int(hostIP[7]) % memberCount + 1))
+			r2 = s.sendto(ackMessage, (parentIP,port))
 
-	else:
+		elif hostTree.index(int(hostId)) > hostTree.index(multicastInitiator) and hostTree.index(int(hostId)) != memberCount - 1:
 
-		if int(message.lastSender[7]) - int(hostId) > 1:
+			childIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) + 1])
 
-			neighborIP = hostIP[:7] + str(int(hostIP[7]) + 1) #5th sends to 1 1 should send to 2 not 5
+			parentIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) - 1])
 
-		else:	
+			message = pickle.dumps(message)
+			
+			r = s.sendto(message,(childIP, port))
 
-			if hostId == '1':	# If my id is 1 but I got from 2 then i send to last member
+			ackMessage = pickle.dumps(Message(multicastSenderId = hostId,message = "ack", clockOfInitiator = message.clockOfInitiator))
 
-				neighborIP = hostIP[:7] + str(memberCount)
-		
-			else:	
 
-				neighborIP = hostIP[:7] + str(int(hostIP[7]) - 1)
+			r2 = s.sendto(ackMessage, (parentIP,port))	
 
-	message.lastSender = hostIP
+		elif hostTree.index(int(hostId)) == 0:
+			
+			parentIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) + 1])
 
-	message = pickle.dumps(message)
+			safeAckmessage = pickle.dumps(Message(multicastSenderId = hostId,message = "safeAck", clockOfInitiator = message.clockOfInitiator))
 
-	f.write("sending message to " + neighborIP + "\n")
+			r2 = s.sendto(safeAckmessage, (parentIP,port))
 
-	r1 = s.sendto(message, (neighborIP, port))
 
-	#f.write("Message is sent by : host " + hostId + "\n") 
+		elif hostTree.index(int(hostId)) == memberCount - 1:
+			
+			parentIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) - 1])
 
-	s.close()
+			safeAckmessage = pickle.dumps(Message(multicastSenderId = hostId,message = "safeAck", clockOfInitiator = message.clockOfInitiator))
 
-	break
+			r2 = s.sendto(safeAckmessage, (parentIP,port))
 
-for i in range(0,len(messageQueue)):
+	elif message.message == "safeAck":
 
-	f.write("Queue of %s, message %s"%(hostId,messageQueue[i].message))
+		if hostTree.index(int(hostId)) < hostTree.index(multicastInitiator)
+
+			parentIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) + 1])
+
+			message = pickle.dumps(message)
+			
+			r = s.sendto(message,(parentIP, port))
+
+			break
+	
+		elif hostTree.index(int(hostId)) > hostTree.index(multicastInitiator)
+
+			parentIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) - 1])
+
+			message = pickle.dumps(message)
+			
+			r = s.sendto(message,(parentIP, port))
+
+			break
+
+######################################################################################################################################################################
+
+f = open("responses/host" + hostId + "delivery.txt")
+
+message, addr = s.recvfrom(1024)
+
+message = pickle.loads(message)
+
+if message.message == "safe":
+
+	popped =  queue.pop()
+
+	f.write(popped + "\n")
+
 
 f.close()
 
