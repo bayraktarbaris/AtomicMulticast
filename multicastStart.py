@@ -2,7 +2,7 @@ from time import sleep
 
 class multicastStart:
 
-	def __init__(self, net, multicastInitiator, numberOfNodes, logicalClock):
+	def __init__(self, net, multicastInitiator, numberOfNodes, logicalClock, port):
 
 		hosts = []
 		
@@ -13,18 +13,19 @@ class multicastStart:
 	
 
 		print hosts
+
 		for i in range(1,numberOfNodes+1):
 
 			if i != multicastInitiator:
 
 				print 'python MulticastReceiver.py ' + str(i)  +  ' ' + str(numberOfNodes) + ' ' + str(multicastInitiator) + ' &'
 				
-				resp1  = hosts[i - 1].cmd('python MulticastReceiver.py ' + str(i)  +  ' ' + str(numberOfNodes) + ' ' + str(multicastInitiator) + ' &')
+				resp1  = hosts[i - 1].cmd('python MulticastReceiver.py ' + str(i)  +  ' ' + str(numberOfNodes) + ' ' + str(multicastInitiator) + ' ' + str(port) + ' &')
 
 		sleep(0.25)		# Wait for receivers to be set up
 
 		print 'python MulticastSender.py ' + str(multicastInitiator) + ' ' + str(numberOfNodes) + ' &'       
 
-		resp = hosts[multicastInitiator - 1].cmd('python MulticastSender.py ' + str(multicastInitiator) + ' ' + str(numberOfNodes) + ' ' + str(logicalClock) + ' &')
+		resp = hosts[multicastInitiator - 1].cmd('python MulticastSender.py ' + str(multicastInitiator) + ' ' + str(numberOfNodes) + ' ' + str(logicalClock) + ' ' + str(port) + ' &')
 
-		print resp1
+		print resp

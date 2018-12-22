@@ -48,14 +48,24 @@ multicastInitiator = int(sys.argv[3])
 
 																			   
 if __name__ == '__main__':
+	os.system("rm -rf responses/host*")
 	net = Mininet( topo=SingleSwitchTopo(numberOfNodes, loss) , link = TCLink)
 	net.start()
 	clocks = {}
-	for i in (1,numberOfNodes+1):
+	for i in range(1,numberOfNodes+1):
 		clocks['host' + str(i)] = 0
+		f = open("responses/host" + str(i) + "delivery.txt",'a+')
+		f.close()
+	print(clocks)	
 	clocks['host' + str(multicastInitiator)] += 1
-	multicastStart(net, multicastInitiator, numberOfNodes,clocks['host' + str(multicastInitiator)])  # Later on we can create multiple instances each of them acting as a different multicast process
-	
+	port = 11000
+	multicastStart(net, multicastInitiator, numberOfNodes,clocks['host' + str(multicastInitiator)], port)  # Later on we can create multiple instances each of them acting as a different multicast process
+	clocks['host' + str(multicastInitiator)] += 1
+	port = 11001
+	multicastStart(net, multicastInitiator, numberOfNodes,clocks['host' + str(multicastInitiator)], port)
+	clocks['host' + str(multicastInitiator)] += 1
+	port = 11002
+	multicastStart(net, multicastInitiator, numberOfNodes,clocks['host' + str(multicastInitiator)], port)
  #  print host1.cmd('ping 127.0.0.1')
  #  print host2.cmd('ifconfig')
 	#net.pingAll()

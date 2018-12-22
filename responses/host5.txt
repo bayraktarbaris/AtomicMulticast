@@ -1,3 +1,16 @@
-host5
-10.0.0.5 1000
-HeartbeatHeartbeat
+12345host5
+10.0.0.5 11000
+12345host5
+10.0.0.5 11001
+Heartbeat
+got  message from 10.0.0.4
+got  message from 10.0.0.4currentTimesafe received
+BBBBB['3 1'] 3 1 
+12345host5
+10.0.0.5 11002
+Heartbeat
+got  message from 10.0.0.4
+got  message from 10.0.0.4currentTimeHeartbeat
+got  message from 10.0.0.4
+got  message from 10.0.0.4currentTimesafe received
+BBBBB['3 2', '3 3'] 3 2 

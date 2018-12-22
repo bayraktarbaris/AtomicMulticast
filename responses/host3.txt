@@ -1,3 +1,34 @@
-host3
-10.0.0.3 1000
-Heartbeat
+All hosts are reachable, Starting multicastinghost3
+10.0.0.211000
+10.0.0.411000
+currentTime12ackreceived from 
+{'10.0.0.2 ack': True, '10.0.0.4 ack': True}11000
+received from 
+{'10.0.0.2 safeAck': True, '10.0.0.4 safeAck': True}11000
+Sender sent all the packets to its neighbors!
+All hosts are reachable, Starting multicastinghost3
+10.0.0.211001
+10.0.0.411001
+currentTime12ackreceived from 
+{'10.0.0.2 ack': False, '10.0.0.4 ack': True}11001
+12ackreceived from 
+{'10.0.0.2 ack': True, '10.0.0.4 ack': True}11001
+received from 
+{'10.0.0.2 safeAck': True, '10.0.0.4 safeAck': False}11001
+All hosts are reachable, Starting multicastinghost3
+10.0.0.211002
+10.0.0.411002
+currentTime12ackreceived from 
+{'10.0.0.2 ack': True, '10.0.0.4 ack': False}11002
+1received from 
+{'10.0.0.2 safeAck': True, '10.0.0.4 safeAck': True}11001
+Sender sent all the packets to its neighbors!
+2safeAckreceived from 
+{'10.0.0.2 ack': True, '10.0.0.4 ack': False}11002
+12safeAckreceived from 
+{'10.0.0.2 ack': True, '10.0.0.4 ack': False}11002
+12safeAckreceived from 
+{'10.0.0.2 ack': True, '10.0.0.4 ack': False}11002
+12safeAckreceived from 
+{'10.0.0.2 ack': True, '10.0.0.4 ack': False}11002
+1
