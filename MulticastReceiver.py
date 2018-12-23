@@ -38,6 +38,8 @@ neighborIp = ""
 
 f = open("responses/host" + hostId + ".txt","a+")
 
+counter = 0
+
 while True:
 
 	s.settimeout(5)
@@ -61,6 +63,7 @@ while True:
 				
 
 				r = s.sendto(message,(childIP, port))
+				counter += 1
 
 			elif hostTree.index(int(hostId)) > hostTree.index(multicastInitiator) and hostTree.index(int(hostId)) != memberCount - 1:	
 
@@ -71,6 +74,7 @@ while True:
 				
 
 				r = s.sendto(message,(childIP, port))
+				counter += 1
 
 			elif hostTree.index(int(hostId)) == 0:
 			
@@ -82,6 +86,7 @@ while True:
 				
 
 				r = s.sendto(message,(childIP, port))	
+				counter += 1
 				break
 
 			elif hostTree.index(int(hostId)) == memberCount - 1:
@@ -95,6 +100,7 @@ while True:
 				
 
 				r = s.sendto(message,(childIP, port))
+				counter += 1
 				break
 
 		elif message.fromChild == True:
@@ -108,6 +114,7 @@ while True:
 				
 
 				r = s.sendto(message,(childIP, port))
+				counter += 1
 
 			elif hostTree.index(int(hostId)) > hostTree.index(multicastInitiator):	
 
@@ -117,6 +124,7 @@ while True:
 				
 
 				r = s.sendto(message,(childIP, port))	
+				counter += 1
 			break
 
 
@@ -166,9 +174,12 @@ if message.message == "currentTime" and message not in queue.read():
 
 		while True:
 
+			
+
 			s.settimeout(1)
 
 			r = s.sendto(message,(childIP, port))
+			counter += 1
 
 			f = open("responses/host" + hostId + ".txt","a+")
 
@@ -199,6 +210,8 @@ if message.message == "currentTime" and message not in queue.read():
 	
 		while True:
 
+			
+
 			f = open("responses/host" + hostId + ".txt","a+")
 
 			f.write("sending message to " + parentIP + safeAckmessage.message)
@@ -208,6 +221,7 @@ if message.message == "currentTime" and message not in queue.read():
 			safeAckmessage = pickle.dumps(safeAckmessage)
 
 			r2 = s.sendto(safeAckmessage, (parentIP,port))
+			counter += 1
 
 			s.settimeout(1)
 
@@ -237,9 +251,12 @@ if message.message == "currentTime" and message not in queue.read():
 
 				safeMessage = pickle.dumps(safeMessage)
 
-				for i in range(0,5):
+				for i in range(memberCount*2):
+
+					
 
 					r = s.sendto(safeMessage,(childIP, port))
+					counter += 1
 
 				while queue.read() != [] and queue.read() != ['']:
 
@@ -277,9 +294,12 @@ if message.message == "currentTime" and message not in queue.read():
 
 		while True:
 
+
+
 			s.settimeout(1)
 
 			r = s.sendto(message,(childIP, port))
+			counter += 1
 
 			f = open("responses/host" + hostId + ".txt","a+")
 
@@ -319,6 +339,7 @@ if message.message == "currentTime" and message not in queue.read():
 			safeAckmessage = pickle.dumps(safeAckmessage)
 
 			r2 = s.sendto(safeAckmessage, (parentIP,port))
+			counter += 1
 
 			s.settimeout(1)
 
@@ -348,9 +369,10 @@ if message.message == "currentTime" and message not in queue.read():
 
 				safeMessage = pickle.dumps(safeMessage)
 
-				for i in range(0,5):
+				for i in range(memberCount*2):
 
 					r = s.sendto(safeMessage,(childIP, port))
+					counter += 1
 
 				while queue.read() != [] and queue.read() != ['']:
 
@@ -391,6 +413,7 @@ if message.message == "currentTime" and message not in queue.read():
 		while True:	
 
 			r2 = s.sendto(safeAckmessage, (parentIP,port))
+			counter += 1
 
 			s.settimeout(2)
 
@@ -470,6 +493,7 @@ if message.message == "currentTime" and message not in queue.read():
 		while True:	
 
 			r2 = s.sendto(safeAckmessage, (parentIP,port))
+			counter += 1
 
 			s.settimeout(2)
 
@@ -522,10 +546,14 @@ if message.message == "currentTime" and message not in queue.read():
 				break		
 
 
+f = open("experiments/counter" + str(memberCount) + ".txt", "a+")
+						
 
+f.write(str(counter) + " ")
+
+f.close()
 
 exit()					
 
 
 ######################################################################################################################################################################
-

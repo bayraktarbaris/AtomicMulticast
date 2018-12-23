@@ -49,6 +49,12 @@ multicastInitiator = int(sys.argv[3])
 																			   
 if __name__ == '__main__':
 	os.system("rm -rf responses/host*")
+	f = open("experiments/counter" + str(numberOfNodes) + ".txt", "a+")
+						
+
+	f.write("\n")
+
+	f.close()
 	net = Mininet( topo=SingleSwitchTopo(numberOfNodes, loss) , link = TCLink)
 	net.start()
 	clocks = {}

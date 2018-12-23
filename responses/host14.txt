@@ -1,8 +1,2 @@
-12345678910111213141516171819202122232425host14
+1234567891011121314151617181920212223host14
 10.0.0.14 11000
-HeartbeatHeartbeatgot  message from 10.0.0.13
-send  message to 10.0.0.15currentTime
-got  message from ('10.0.0.15', 11000) message : safeAck
-sending message to 10.0.0.13safeAckgot  message from ('10.0.0.13', 57771) message : safe
-Got the messagesafe 
-Current queue: ['13 1'] multicastInitiator: 13 clockOfInitiator: 1 

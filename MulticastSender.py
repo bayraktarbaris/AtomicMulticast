@@ -51,6 +51,8 @@ neighborIPs.append(Ip + neighbors[0])
 neighborIPs.append(Ip + neighbors[1])
 
 ########################################################################################################################################
+counter = 0
+
 sender_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 hostIP = Ip + hostId
@@ -63,11 +65,13 @@ heartBeatMessage1 = pickle.dumps(
 heartBeatMessage2 = pickle.dumps(
     Message(multicastSenderId=hostId, message="Heartbeat", clockOfInitiator=clockOfInitiator))
 
-for i in range(3):
+for i in range(memberCount*6):
 
     r1 = sender_socket.sendto(heartBeatMessage1, (neighborIPs[0], port))
+    counter += 1
 
     r2 = sender_socket.sendto(heartBeatMessage2, (neighborIPs[1], port))
+    counter += 1
 
     sender_socket.settimeout(1)
 
@@ -123,8 +127,10 @@ startingTime = time.time()
 
 while True:
     r1 = sender_socket.sendto(message, (neighborIPs[0], port))
+    counter += 1
 
     r2 = sender_socket.sendto(message, (neighborIPs[1], port))
+    counter += 1
 
     sender_socket.settimeout(5)
 
@@ -181,11 +187,13 @@ host = '10.0.0.' + hostId
 
 safeMessage = pickle.dumps(Message(multicastSenderId=hostId, message="safe", clockOfInitiator=clockOfInitiator))
 
-for i in range(15):
+for i in range(memberCount*2):
 
     r1 = sender_socket.sendto(safeMessage, (neighborIPs[0], port))
+    counter += 1
 
     r2 = sender_socket.sendto(safeMessage, (neighborIPs[1], port))
+    counter += 1
 
 endingTime = time.time()
 
@@ -217,6 +225,13 @@ while queue.read() != [] and queue.read() != ['']:
 f = open("responses/initiatorTime" +str(memberCount) + ".txt", "a+")
 
 f.write(str(endingTime - startingTime) + "\n" )
+
+f.close()
+
+f = open("experiments/counter" + str(memberCount) + ".txt", "a+")
+						
+
+f.write(str(counter) + " ")
 
 f.close()
 

@@ -1,7 +1,0 @@
-12345678910111213141516171819202122232425host25
-10.0.0.25 11000
-Heartbeatgot  message from 10.0.0.24
-got  message from 10.0.0.24currentTime
-got  message from ('10.0.0.24', 11000) message : safe
-Got the messagesafe 
-Current queue: ['13 1'] multicastInitiator: 13 clockOfInitiator: 1 
