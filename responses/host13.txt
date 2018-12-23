@@ -1,0 +1,10 @@
+All hosts are reachable, Starting multicastinghost13
+10.0.0.1211000
+10.0.0.1411000
+currentTimeWaiting to receive SafeAck from childs 
+Got the message :safeAck from child ('10.0.0.12', 11000) 
+Got the message :safeAck from child ('10.0.0.14', 11000) 
+received from 
+{'10.0.0.12 safeAck': True, '10.0.0.14 safeAck': True}11000
+Current queue: ['13 1'] multicastInitiator: 13 clockOfInitiator: 1 
+Sender sent all the packets to its neighbors!

@@ -60,12 +60,12 @@ if __name__ == '__main__':
 	clocks['host' + str(multicastInitiator)] += 1
 	port = 11000
 	multicastStart(net, multicastInitiator, numberOfNodes,clocks['host' + str(multicastInitiator)], port)  # Later on we can create multiple instances each of them acting as a different multicast process
-	clocks['host' + str(multicastInitiator)] += 1
-	port = 11001
-	multicastStart(net, multicastInitiator, numberOfNodes,clocks['host' + str(multicastInitiator)], port)
-	clocks['host' + str(multicastInitiator)] += 1
-	port = 11002
-	multicastStart(net, multicastInitiator, numberOfNodes,clocks['host' + str(multicastInitiator)], port)
+	#clocks['host' + str(multicastInitiator-1)] += 1
+	#port = 11001
+	#multicastStart(net, multicastInitiator-1, numberOfNodes,clocks['host' + str(multicastInitiator-1)], port)
+	#clocks['host' + str(multicastInitiator)] += 1
+	#port = 11002
+	#multicastStart(net, multicastInitiator, numberOfNodes,clocks['host' + str(multicastInitiator)], port)
  #  print host1.cmd('ping 127.0.0.1')
  #  print host2.cmd('ifconfig')
 	#net.pingAll()

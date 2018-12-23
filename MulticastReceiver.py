@@ -1,6 +1,7 @@
 import socket
 import sys
 import pickle
+import time
 from message import Message
 from queue import Queue
 
@@ -145,7 +146,7 @@ message, (addr,_) = s.recvfrom(1024)
 
 f = open("responses/host" + hostId + ".txt","a+")
 
-f.write("\ngot  message from " + str(addr))
+f.write("got  message from " + str(addr) + "\n")
 
 f.close()
 
@@ -171,244 +172,86 @@ if message.message == "currentTime" and message not in queue.read():
 
 			f = open("responses/host" + hostId + ".txt","a+")
 
-			f.write("\nsend  message to " + str(childIP) + pickle.loads(message).message)
+			f.write("send  message to " + str(childIP) + pickle.loads(message).message + "\n")
 
 			f.close()
 
 			try:
 
-				message, addr = s.recvfrom(1024)
+				safeAckmessage, addr = s.recvfrom(1024)
+
+				safeAckmessage = pickle.loads(safeAckmessage)
 
 				f = open("responses/host" + hostId + ".txt","a+")
 
-				f.write("\ngot  message from " + str(addr) + pickle.loads(message).message)
+				f.write("got  message from " + str(addr) + " message : " + safeAckmessage.message + "\n")
 
 				f.close()
-
-				message = pickle.loads(message)
 
 			except:
 
 				continue
 
-			if message.message == "ack":
+			if safeAckmessage.message == "safeAck":
 
 				break
 
-		ackMessage = pickle.dumps(Message(multicastSenderId = hostId,message = "ack", clockOfInitiator = message.clockOfInitiator))
-
-
-		r2 = s.sendto(ackMessage, (parentIP,port))
-
-		f = open("responses/host" + hostId + ".txt","a+")
-
-		f.write("\nsent message to " + parentIP + pickle.loads(ackMessage).message)
-
-		f.close()	
-
-	elif hostTree.index(int(hostId)) > hostTree.index(multicastInitiator) and hostTree.index(int(hostId)) != memberCount - 1:
-
-		childIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) + 1])
-
-		parentIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) - 1])
-
-		message = pickle.dumps(message)
-		
+	
 		while True:
+
+			f = open("responses/host" + hostId + ".txt","a+")
+
+			f.write("sending message to " + parentIP + safeAckmessage.message)
+
+			f.close()
+
+			safeAckmessage = pickle.dumps(safeAckmessage)
+
+			r2 = s.sendto(safeAckmessage, (parentIP,port))
 
 			s.settimeout(1)
 
-			r = s.sendto(message,(childIP, port))
-
 			try:
 
-				message, addr = s.recvfrom(1024)
+				safeMessage, addr = s.recvfrom(1024)
+
+				safeMessage = pickle.loads(safeMessage)
 
 				f = open("responses/host" + hostId + ".txt","a+")
 
-				f.write("\ngot  message from " + str(addr) + pickle.loads(message).message)
+				f.write("got  message from " + str(addr) + " message : " + safeMessage.message + "\n")
 
 				f.close()
-
-				message = pickle.loads(message)
-
-			except:
-
-				continue
-
-			if message.message == "ack":
-
-				break
-
-		ackMessage = pickle.dumps(Message(multicastSenderId = hostId,message = "ack", clockOfInitiator = message.clockOfInitiator))
-
-
-		r2 = s.sendto(ackMessage, (parentIP,port))
-
-		f = open("responses/host" + hostId + ".txt","a+")
-
-		f.write("\nsent message to " + parentIP + pickle.loads(ackMessage).message)
-
-		f.close()	
-
-	elif hostTree.index(int(hostId)) == 0:
-
-		f = open("responses/host" + hostId + ".txt","a+")
-
-		f.write("\ngot  message from " + str(addr) + message.message)
-
-		f.close()
-		
-		parentIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) + 1])
-
-		ackMessage = pickle.dumps(Message(multicastSenderId = hostId,message = "ack", clockOfInitiator = message.clockOfInitiator))
-
-		safeAckmessage = pickle.dumps(Message(multicastSenderId = hostId,message = "safeAck", clockOfInitiator = message.clockOfInitiator))
-
-		r = s.sendto(ackMessage, (parentIP,port))
-
-		r2 = s.sendto(safeAckmessage, (parentIP,port))
-
-
-	elif hostTree.index(int(hostId)) == memberCount - 1:
-
-		f = open("responses/host" + hostId + ".txt","a+")
-
-		f.write("\ngot  message from " + str(addr) + message.message)
-
-		f.close()
-		
-		parentIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) - 1])
-
-		ackMessage = pickle.dumps(Message(multicastSenderId = hostId,message = "ack", clockOfInitiator = message.clockOfInitiator))
-
-		safeAckmessage = pickle.dumps(Message(multicastSenderId = hostId,message = "safeAck", clockOfInitiator = message.clockOfInitiator))
-
-		r = s.sendto(ackMessage, (parentIP,port))
-
-		r2 = s.sendto(safeAckmessage, (parentIP,port))
-
-
-message, addr = s.recvfrom(1024)
-
-
-message = pickle.loads(message) 		
-
-if message.message == "safeAck":
-
-	if hostTree.index(int(hostId)) < hostTree.index(multicastInitiator):
-
-		parentIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) + 1])
-
-		message = pickle.dumps(message)
-
-		while True:
-
-			s.settimeout(1)
-
-			r = s.sendto(message,(parentIP, port))
-
-			try:
-
-				message2, addr = s.recvfrom(1024)
-
-				message2 = pickle.loads(message2)
 
 			except:
 			
 				continue
 
-			if message2.message == "safe":
-				f= open("responses/host" + hostId + ".txt","a+")
-
-				f.write("AAAAAA" + str(queue.read()))
-
-				f.close()
-				childIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) - 1])
-
-				message2 = pickle.dumps(message2)
-
-				for i in range(0,5):
-
-					r = s.sendto(message2,(childIP, port))
-
-				while queue.read() != [] and queue.read() != ['']:
-
-					f= open("responses/host" + hostId + ".txt","a+")
-
-					f.write("\nBBBBB"+str(queue.read()) +" "+ str(multicastInitiator) +" "+ str(pickle.loads(message2).clockOfInitiator) +" "+"\n")
-
-					f.close()
-
-					if queue.read()[0].split()[0] == str(multicastInitiator) and str(pickle.loads(message2).clockOfInitiator) == queue.read()[0].split()[1]:
-
-
-
-						f = open("responses/host" + hostId + "delivery.txt", "a+")
-						
-						popped =  queue.pop()
-
-						f.write(popped + "\n")
-
-						f.close()
-
-						break
-
-				break			
-
-
-	elif hostTree.index(int(hostId)) > hostTree.index(multicastInitiator):
-
-		parentIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) - 1])
-
-		message = pickle.dumps(message)
-
-		while True:
-
-			s.settimeout(1)
-
-			r = s.sendto(message,(parentIP, port))
-
-			try:
-
-				message2, addr = s.recvfrom(1024)
-
-				message2 = pickle.loads(message2)
-
-			except:
+			if safeMessage.message == "safe":
 			
-				continue
+				f = open("responses/host" + hostId + ".txt","a+")
 
-			if message2.message == "safe":
-				f= open("responses/host" + hostId + ".txt","a+")
-
-				f.write("safe received")
+				f.write("Got the message" + safeMessage.message + " \n")
 
 				f.close()
-				childIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) + 1])
 
-				message2 = pickle.dumps(message2)
+				safeMessage = pickle.dumps(safeMessage)
 
 				for i in range(0,5):
 
-					r = s.sendto(message2,(childIP, port))
-				f= open("responses/host" + hostId + ".txt","a+")
-				f.write("\n1\n")
-				f.close()
-				f= open("responses/host" + hostId + ".txt","a+")
-				f.write("\n"+str(queue.read())+"\n")
-				f.close()
-				f= open("responses/host" + hostId + ".txt","a+")
-				f.write("\n2\n")
-				f.close()
+					r = s.sendto(safeMessage,(childIP, port))
 
 				while queue.read() != [] and queue.read() != ['']:
+
 					f= open("responses/host" + hostId + ".txt","a+")
 
-					f.write("\nBBBBB"+str(queue.read()) +" "+ str(multicastInitiator) +" "+ str(pickle.loads(message2).clockOfInitiator) +" "+"\n")
+					f.write("Current queue: "+ str(queue.read()) + " multicastInitiator: "+ str(multicastInitiator) +" clockOfInitiator: "+ str(pickle.loads(safeMessage).clockOfInitiator) +" "+"\n")
 
 					f.close()
-					if queue.read()[0].split()[0]	== str(multicastInitiator)  and str(pickle.loads(message2).clockOfInitiator) == queue.read()[0].split()[1]:
+
+					if queue.read()[0].split()[0] == str(multicastInitiator) and str(pickle.loads(safeMessage).clockOfInitiator) == queue.read()[0].split()[1]:
+
+
 
 						f = open("responses/host" + hostId + "delivery.txt", "a+")
 						
@@ -422,30 +265,264 @@ if message.message == "safeAck":
 
 				break					
 
+				
 
-elif message.message == "safe":
-	f= open("responses/host" + hostId + ".txt","a+")
+	elif hostTree.index(int(hostId)) > hostTree.index(multicastInitiator) and hostTree.index(int(hostId)) != memberCount - 1:
 
-	f.write("safe received")
+		childIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) + 1])
 
-	f.close()
-	while queue.read() != [] and queue.read() != ['']:
-		f= open("responses/host" + hostId + ".txt","a+")
+		parentIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) - 1])
 
-		f.write("\nBBBBB"+str(queue.read()) +" "+ str(multicastInitiator) +" "+ str(message.clockOfInitiator) +" "+"\n")
+		message = pickle.dumps(message)
 
-		f.close()
-		if queue.read()[0].split()[0]	== str(multicastInitiator)  and str(message.clockOfInitiator) == queue.read()[0].split()[1]:
+		while True:
 
-			f = open("responses/host" + hostId + "delivery.txt",'a+')
-			
-			popped =  queue.pop()
+			s.settimeout(1)
 
-			f.write(popped + "\n")
+			r = s.sendto(message,(childIP, port))
+
+			f = open("responses/host" + hostId + ".txt","a+")
+
+			f.write("send  message to " + str(childIP) + pickle.loads(message).message + "\n")
 
 			f.close()
 
-			break
+			try:
+
+				safeAckmessage, addr = s.recvfrom(1024)
+
+				safeAckmessage = pickle.loads(safeAckmessage)
+
+				f = open("responses/host" + hostId + ".txt","a+")
+
+				f.write("got  message from " + str(addr) + " message : " + safeAckmessage.message + "\n")
+
+				f.close()
+
+			except:
+
+				continue
+
+			if safeAckmessage.message == "safeAck":
+
+				break
+
+	
+		while True:
+
+			f = open("responses/host" + hostId + ".txt","a+")
+
+			f.write("sending message to " + parentIP + safeAckmessage.message)
+
+			f.close()
+
+			safeAckmessage = pickle.dumps(safeAckmessage)
+
+			r2 = s.sendto(safeAckmessage, (parentIP,port))
+
+			s.settimeout(1)
+
+			try:
+
+				safeMessage, addr = s.recvfrom(1024)
+
+				safeMessage = pickle.loads(safeMessage)
+
+				f = open("responses/host" + hostId + ".txt","a+")
+
+				f.write("got  message from " + str(addr) + " message : " + safeMessage.message + "\n")
+
+				f.close()
+
+			except:
+			
+				continue
+
+			if safeMessage.message == "safe":
+			
+				f = open("responses/host" + hostId + ".txt","a+")
+
+				f.write("Got the message" + safeMessage.message + " \n")
+
+				f.close()
+
+				safeMessage = pickle.dumps(safeMessage)
+
+				for i in range(0,5):
+
+					r = s.sendto(safeMessage,(childIP, port))
+
+				while queue.read() != [] and queue.read() != ['']:
+
+					f= open("responses/host" + hostId + ".txt","a+")
+
+					f.write("Current queue: "+ str(queue.read()) + " multicastInitiator: "+ str(multicastInitiator) +" clockOfInitiator: "+ str(pickle.loads(safeMessage).clockOfInitiator) +" "+"\n")
+
+					f.close()
+
+					if queue.read()[0].split()[0] == str(multicastInitiator) and str(pickle.loads(safeMessage).clockOfInitiator) == queue.read()[0].split()[1]:
+
+
+
+						f = open("responses/host" + hostId + "delivery.txt", "a+")
+						
+						popped =  queue.pop()
+
+						f.write(popped + "\n")
+
+						f.close()
+
+						break
+
+				break	
+
+	elif hostTree.index(int(hostId)) == 0:
+
+		f = open("responses/host" + hostId + ".txt","a+")
+
+		f.write("got  message from " + str(addr) + message.message + "\n")
+
+		f.close()
+		
+		parentIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) + 1])
+
+		safeAckmessage = pickle.dumps(Message(multicastSenderId = hostId,message = "safeAck", clockOfInitiator = message.clockOfInitiator))
+
+		while True:	
+
+			r2 = s.sendto(safeAckmessage, (parentIP,port))
+
+			s.settimeout(2)
+
+			startingTime = time.time()
+
+			try:
+
+				safeMessage, addr = s.recvfrom(1024)
+
+				safeMessage = pickle.loads(safeMessage)
+
+				f = open("responses/host" + hostId + ".txt","a+")
+
+				f.write("got  message from " + str(addr) + " message : " + safeMessage.message + "\n")
+
+				f.close()
+
+			except: 
+			
+				continue
+
+			if 	safeMessage.message == "safe":
+
+				f = open("responses/host" + hostId + ".txt","a+")
+
+				f.write("Got the message" + safeMessage.message + " \n")
+
+				f.close()
+
+				while queue.read() != [] and queue.read() != ['']:
+
+					f= open("responses/host" + hostId + ".txt","a+")
+
+					f.write("Current queue: "+ str(queue.read()) + " multicastInitiator: "+ str(multicastInitiator) +" clockOfInitiator: "+ str(safeMessage.clockOfInitiator) +" "+"\n")
+
+					f.close()
+
+					if queue.read()[0].split()[0] == str(multicastInitiator) and str(safeMessage.clockOfInitiator) == queue.read()[0].split()[1]:
+
+
+
+						f = open("responses/host" + hostId + "delivery.txt", "a+")
+						
+						popped =  queue.pop()
+
+						endingTime = time.time()
+
+						f.write(popped + "\n" )
+
+						f.close()
+
+						f = open("responses/leaftime" + str(memberCount)+ ".txt", "a+")
+
+						f.write(str(endingTime - startingTime) + "\n" )
+
+						f.close()
+
+						break
+
+				break		
+
+
+
+
+	elif hostTree.index(int(hostId)) == memberCount - 1:
+
+		f = open("responses/host" + hostId + ".txt","a+")
+
+		f.write("got  message from " + str(addr) + message.message + "\n")
+
+		f.close()
+		
+		parentIP = '10.0.0.' + str(hostTree[hostTree.index(int(hostId)) - 1])
+
+		safeAckmessage = pickle.dumps(Message(multicastSenderId = hostId,message = "safeAck", clockOfInitiator = message.clockOfInitiator))
+
+		while True:	
+
+			r2 = s.sendto(safeAckmessage, (parentIP,port))
+
+			s.settimeout(2)
+
+			try:
+
+				safeMessage, addr = s.recvfrom(1024)
+
+				safeMessage = pickle.loads(safeMessage)
+
+				f = open("responses/host" + hostId + ".txt","a+")
+
+				f.write("got  message from " + str(addr) + " message : " + safeMessage.message + "\n")
+
+				f.close()
+
+			except: 
+			
+				continue
+
+			if 	safeMessage.message == "safe":
+
+				f = open("responses/host" + hostId + ".txt","a+")
+
+				f.write("Got the message" + safeMessage.message + " \n")
+
+				f.close()
+
+				while queue.read() != [] and queue.read() != ['']:
+
+					f= open("responses/host" + hostId + ".txt","a+")
+
+					f.write("Current queue: "+ str(queue.read()) + " multicastInitiator: "+ str(multicastInitiator) +" clockOfInitiator: "+ str(safeMessage.clockOfInitiator) +" "+"\n")
+
+					f.close()
+
+					if queue.read()[0].split()[0] == str(multicastInitiator) and str(safeMessage.clockOfInitiator) == queue.read()[0].split()[1]:
+
+
+
+						f = open("responses/host" + hostId + "delivery.txt", "a+")
+						
+						popped =  queue.pop()
+
+						f.write(popped + "\n")
+
+						f.close()
+
+						break
+
+				break		
+
+
+
 
 exit()					
 
