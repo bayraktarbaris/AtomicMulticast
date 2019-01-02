@@ -1,15 +1,15 @@
 import numpy as np
 import scipy.stats
 import matplotlib.pyplot as plt
-### Script for performing experiment 1 ###
+### Script for performing experiment 2 ###
 
 results = []
-ranges = range(5,27,2)
+ranges = [4,8,12,18,24,30]
 for i in ranges:
 
-	f1 = open("responses/initiatorTime" + str(i) + ".txt","r")
+	f1 = open("responses/initiatorTime" + str(5) + "poisson" + str(i) + ".txt","r")
 
-	f2 = open("responses/leaftime" + str(i) + ".txt","r")
+	f2 = open("responses/leaftime" + str(5) + "poisson" + str(i) +".txt","r")
 
 	arr1 = np.array([])
 
@@ -23,7 +23,7 @@ for i in ranges:
 	
 		arr2 = np.append(arr2, float(line2[:-1]))
 
-	results.append((arr1+arr2)[:100])
+	results.append((arr1+arr2))
 	
 means = []
 
@@ -43,12 +43,12 @@ for i in range(len(results)):
 x_axis = ranges
 
 
-plt.suptitle('Group size vs Stable Delivery Time', fontsize=15)
+plt.suptitle('Lambda vs Stable Delivery Time', fontsize=15)
 
 # exp1_rdt_loss
 
 #plt.subplot(1, 2, 1)
-plt.xlabel('Group Size')
+plt.xlabel('Lambda (packets/sec)')
 plt.ylabel('Stable Delivery Time(sec)')
 rdt = plt.boxplot(linspaces, labels=x_axis)
 plt.plot(x_axis, means)

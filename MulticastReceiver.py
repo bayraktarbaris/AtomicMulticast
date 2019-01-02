@@ -42,7 +42,7 @@ counter = 0
 
 while True:
 
-	s.settimeout(5)
+	s.settimeout(50)
 
 	message, addr = s.recvfrom(1024)
 
@@ -176,7 +176,7 @@ if message.message == "currentTime" and message not in queue.read():
 
 			
 
-			s.settimeout(1)
+			s.settimeout(10)
 
 			r = s.sendto(message,(childIP, port))
 			counter += 1
@@ -223,7 +223,7 @@ if message.message == "currentTime" and message not in queue.read():
 			r2 = s.sendto(safeAckmessage, (parentIP,port))
 			counter += 1
 
-			s.settimeout(1)
+			s.settimeout(10)
 
 			try:
 
@@ -258,6 +258,12 @@ if message.message == "currentTime" and message not in queue.read():
 					r = s.sendto(safeMessage,(childIP, port))
 					counter += 1
 
+				f = open("responses/host" + hostId + ".txt","a+")
+
+				f.write("Before while" + str(queue.read()) + " \n")
+
+				f.close()	
+
 				while queue.read() != [] and queue.read() != ['']:
 
 					f= open("responses/host" + hostId + ".txt","a+")
@@ -275,6 +281,12 @@ if message.message == "currentTime" and message not in queue.read():
 						popped =  queue.pop()
 
 						f.write(popped + "\n")
+
+						f.close()
+
+						f = open("responses/host" + hostId + ".txt","a+")
+
+						f.write("Popped message " + popped  + str(queue.read())+ " \n")
 
 						f.close()
 
@@ -296,7 +308,7 @@ if message.message == "currentTime" and message not in queue.read():
 
 
 
-			s.settimeout(1)
+			s.settimeout(10)
 
 			r = s.sendto(message,(childIP, port))
 			counter += 1
@@ -341,7 +353,7 @@ if message.message == "currentTime" and message not in queue.read():
 			r2 = s.sendto(safeAckmessage, (parentIP,port))
 			counter += 1
 
-			s.settimeout(1)
+			s.settimeout(10)
 
 			try:
 
@@ -373,7 +385,11 @@ if message.message == "currentTime" and message not in queue.read():
 
 					r = s.sendto(safeMessage,(childIP, port))
 					counter += 1
+				f = open("responses/host" + hostId + ".txt","a+")
 
+				f.write("Before while" + str(queue.read()) + " \n")
+
+				f.close()
 				while queue.read() != [] and queue.read() != ['']:
 
 					f= open("responses/host" + hostId + ".txt","a+")
@@ -394,7 +410,13 @@ if message.message == "currentTime" and message not in queue.read():
 
 						f.close()
 
-						break
+						f = open("responses/host" + hostId + ".txt","a+")
+
+						f.write("Popped message " + popped + str(queue.read()) + " \n")
+
+						f.close()
+
+						break	
 
 				break	
 
@@ -415,7 +437,7 @@ if message.message == "currentTime" and message not in queue.read():
 			r2 = s.sendto(safeAckmessage, (parentIP,port))
 			counter += 1
 
-			s.settimeout(2)
+			s.settimeout(20)
 
 			startingTime = time.time()
 
@@ -440,6 +462,12 @@ if message.message == "currentTime" and message not in queue.read():
 				f = open("responses/host" + hostId + ".txt","a+")
 
 				f.write("Got the message" + safeMessage.message + " \n")
+
+				f.close()
+
+				f = open("responses/host" + hostId + ".txt","a+")
+
+				f.write("Before while" + str(queue.read()) + " \n")
 
 				f.close()
 
@@ -471,7 +499,13 @@ if message.message == "currentTime" and message not in queue.read():
 
 						f.close()
 
-						break
+						f = open("responses/host" + hostId + ".txt","a+")
+
+						f.write("Popped message " + popped + str(queue.read()) + " \n")
+
+						f.close()
+
+						break	
 
 				break		
 
@@ -495,7 +529,7 @@ if message.message == "currentTime" and message not in queue.read():
 			r2 = s.sendto(safeAckmessage, (parentIP,port))
 			counter += 1
 
-			s.settimeout(2)
+			s.settimeout(20)
 
 			try:
 
@@ -521,6 +555,12 @@ if message.message == "currentTime" and message not in queue.read():
 
 				f.close()
 
+				f = open("responses/host" + hostId + ".txt","a+")
+
+				f.write("Before while" + str(queue.read()) + " \n")
+
+				f.close()
+
 				while queue.read() != [] and queue.read() != ['']:
 
 					f= open("responses/host" + hostId + ".txt","a+")
@@ -541,7 +581,13 @@ if message.message == "currentTime" and message not in queue.read():
 
 						f.close()
 
-						break
+						f = open("responses/host" + hostId + ".txt","a+")
+
+						f.write("Popped message " + popped + str(queue.read()) + " \n")
+
+						f.close()
+
+						break	
 
 				break		
 

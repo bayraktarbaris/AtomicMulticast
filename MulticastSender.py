@@ -73,7 +73,7 @@ for i in range(memberCount*6):
     r2 = sender_socket.sendto(heartBeatMessage2, (neighborIPs[1], port))
     counter += 1
 
-    sender_socket.settimeout(1)
+    sender_socket.settimeout(10)
 
     try:
 
@@ -121,8 +121,6 @@ book = {neighborIPs[0] + " safeAck": False, neighborIPs[1] + " safeAck": False}
 
 queue = Queue("responses/host" + hostId + "queue.txt")
 
-queue.append(str(pickle.loads(message).multicastSenderId) + ' ' + str(pickle.loads(message).clockOfInitiator))
-
 startingTime = time.time()
 
 while True:
@@ -132,7 +130,7 @@ while True:
     r2 = sender_socket.sendto(message, (neighborIPs[1], port))
     counter += 1
 
-    sender_socket.settimeout(5)
+    sender_socket.settimeout(50)
 
     try:
         f = open("responses/host" + hostId + ".txt", "a+")
@@ -180,7 +178,7 @@ while True:
     break
 
 #################################################################################################################################################################
-
+queue.append(str(pickle.loads(message).multicastSenderId) + ' ' + str(pickle.loads(message).clockOfInitiator))
 sender_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 host = '10.0.0.' + hostId
@@ -239,3 +237,5 @@ f = open("responses/host" + hostId + ".txt", "a+")
 f.write("Sender sent all the packets to its neighbors!\n")
 
 f.close()
+
+sleep(3)

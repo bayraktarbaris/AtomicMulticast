@@ -1,13 +1,13 @@
 import numpy as np
 import scipy.stats
 import matplotlib.pyplot as plt
-### Script for performing experiment 3 ###
+### Script for performing experiment 4 ###
 
 results = []
-ranges = range(5,25,2)
+ranges = [4,8,12,16]
 for i in ranges:
 
-	f1 = open("experiments/counter" + str(i) + ".txt","r")
+	f1 = open("experiments/counter5poisson" + str(i) + "delay6.txt","r")
 
 	arr1 = np.array([])
 
@@ -20,7 +20,7 @@ for i in ranges:
 
 		arr1 = np.append(arr1, tmp)
 
-	results.append(576*arr1[:50]/i)
+	results.append(576*arr1[:50]/(i*100))
 	
 means = []
 
@@ -42,12 +42,12 @@ for i in range(len(results)):
 x_axis = ranges
 
 
-plt.suptitle('Group size vs Efficiency', fontsize=15)
+plt.suptitle('Lambda vs Efficiency', fontsize=15)
 
 # exp1_rdt_loss
 
 #plt.subplot(1, 2, 1)
-plt.xlabel('Group Size')
+plt.xlabel('Lambda')
 plt.ylabel('Efficiency(total number of bits per useful bit)')
 rdt = plt.boxplot(linspaces, labels=x_axis)
 plt.plot(x_axis, means)

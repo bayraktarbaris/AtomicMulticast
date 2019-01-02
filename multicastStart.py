@@ -1,5 +1,7 @@
 from time import sleep
 
+#Script that runs the MulticastSender.py, MulticastReceiver.py on the appropriate hosts(servers)
+
 class multicastStart:
 
 	def __init__(self, net, multicastInitiator, numberOfNodes, logicalClock, port):
